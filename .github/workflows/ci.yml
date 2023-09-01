@@ -57,7 +57,12 @@ jobs:
       - name: Make all
         working-directory: .
         run: ./scripts/all.sh
-
+        
+      - name: Get Checksum
+        run: |
+          ARTIFACT_CHECKSUM=$(swift package compute-checksum ${{ env.ARTIFACT_PATH }})
+          echo "ARTIFACT_CHECKSUM=$ARTIFACT_CHECKSUM" >> $GITHUB_ENV
+          
       - name: Update Package.swift
         run: |
           python3 scripts/swift_package_generator.py --url "${{ env.RELEASES_DOWNLOAD_URL }}/${{ env.RELEASE_TAG }}/${{ env.ARTIFACT_NAME }}" --checksum ${{ env.ARTIFACT_CHECKSUM }}
@@ -70,11 +75,6 @@ jobs:
       #   with:
       #     name: ${{ env.ARTIFACT_NAME }}
       #     path: ${{ env.ARTIFACT_DIR }}
-
-      - name: Get Checksum
-        run: |
-          ARTIFACT_CHECKSUM=$(swift package compute-checksum ${{ env.ARTIFACT_PATH }})
-          echo "ARTIFACT_CHECKSUM=$ARTIFACT_CHECKSUM" >> $GITHUB_ENV
 
       - name: Release
         uses: softprops/action-gh-release@9729932bfb75c05ad1f6e3a729294e05abaa7001

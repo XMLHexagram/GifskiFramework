@@ -40,7 +40,7 @@ jobs:
           RELEASES_DOWNLOAD_URL=https://github.com/$GITHUB_REPOSITORY/releases/download
           echo "RELEASES_DOWNLOAD_URL=$RELEASES_DOWNLOAD_URL" >> $GITHUB_ENV
 
-          cd gifski && git checkout 1.11.0 && cd ..
+          cd gifski && git pull && git checkout 1.11.0 && cd ..
 
           GIFSKI_COMMIT=$(cd gifski && git rev-parse --short=8 HEAD)
           echo "GIFSKI_COMMIT=$GIFSKI_COMMIT" >> $GITHUB_ENV

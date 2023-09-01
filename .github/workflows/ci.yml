@@ -16,7 +16,6 @@ env:
   GIFSKI_REPO: https://github.com/ImageOptim/gifski
   ARTIFACT_NAME: GifskiFramework.zip
   ARTIFACT_DIR: ./gifski
-  ARTIFACT_PATH: ${{ env.ARTIFACT_DIR }}/${{ env.ARTIFACT_NAME }}
 
 jobs:
   build-GifskiFramework:
@@ -35,6 +34,9 @@ jobs:
 
       - name: Set Envs
         run: |
+          ARTIFACT_PATH="${{ env.ARTIFACT_DIR }}/${{ env.ARTIFACT_NAME }}"
+          echo "ARTIFACT_PATH=$ARTIFACT_PATH" >> $GITHUB_ENV
+        
           RELEASES_DOWNLOAD_URL=https://github.com/$GITHUB_REPOSITORY/releases/download
           echo "RELEASES_DOWNLOAD_URL=$RELEASES_DOWNLOAD_URL" >> $GITHUB_ENV
 
@@ -44,7 +46,7 @@ jobs:
           GIFSKI_VERSION=$(cd gifski && git describe --tag)
           echo "GIFSKI_VERSION=$GIFSKI_VERSION" >> $GITHUB_ENV
 
-          GIFSKI_COMMIT_URL=${{ env.GIFSKI_REPO }}/tree/$GIFSKI_COMMIT
+          GIFSKI_COMMIT_URL="${{ env.GIFSKI_REPO }}/tree/$GIFSKI_COMMIT"
           echo "GIFSKI_COMMIT_URL=$GIFSKI_COMMIT_URL" >> $GITHUB_ENV
 
           RELEASE_TAG=$GIFSKI_VERSION

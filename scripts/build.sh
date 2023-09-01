@@ -37,3 +37,5 @@ xcodebuild -create-xcframework \
 -library libs/libgifski-ios.a \
 -headers ./headers/ \
 -output Gifski.xcframework
+
+zip --symlinks -r GifskiFramework.zip Gifski.xcframework

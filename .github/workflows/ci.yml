@@ -1,0 +1,83 @@
+name: CI
+
+# Controls when the workflow will run
+on:
+  push:
+    branches: [main]
+    paths:
+      - "gifski" # on TDLib updates
+  pull_request:
+    branches: [main]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  GIFSKI_REPO: https://github.com/ImageOptim/gifski
+  ARTIFACT_NAME: GifskiFramework.zip
+  ARTIFACT_DIR: ./gifski
+  ARTIFACT_PATH: ${{ env.ARTIFACT_DIR }}/${{ env.ARTIFACT_NAME }}
+
+jobs:
+  build-GifskiFramework:
+    runs-on: macos-13
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Guard Submodules Is Version Release
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        run: |
+          set -e
+          cd gifski && git describe --contains
+
+      - name: Set Envs
+        run: |
+          RELEASES_DOWNLOAD_URL=https://github.com/$GITHUB_REPOSITORY/releases/download
+          echo "RELEASES_DOWNLOAD_URL=$RELEASES_DOWNLOAD_URL" >> $GITHUB_ENV
+
+          GIFSKI_COMMIT=$(cd gifski && git rev-parse --short=8 HEAD)
+          echo "GIFSKI_COMMIT=$GIFSKI_COMMIT" >> $GITHUB_ENV
+
+          GIFSKI_VERSION=$(cd gifski && git describe --tag)
+          echo "GIFSKI_VERSION=$GIFSKI_VERSION" >> $GITHUB_ENV
+
+          GIFSKI_COMMIT_URL=${{ env.GIFSKI_REPO }}/tree/$GIFSKI_COMMIT
+          echo "GIFSKI_COMMIT_URL=$GIFSKI_COMMIT_URL" >> $GITHUB_ENV
+
+          RELEASE_TAG=$GIFSKI_VERSION
+          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+
+      - name: Make all
+        working-directory: .
+        run: ./scripts/all.sh
+
+      - name: Update Package.swift
+        run: |
+          python3 scripts/swift_package_generator.py --url "${{ env.RELEASES_DOWNLOAD_URL }}/${{ env.RELEASE_TAG }}/${{ env.ARTIFACT_NAME }}" --checksum ${{ env.ARTIFACT_CHECKSUM }}
+          git add Package.swift || true
+          git commit -m "[no ci] Bump tdlib ${{ env.RELEASE_TAG }}" || true
+          git push origin main || true
+
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ${{ env.ARTIFACT_NAME }}
+      #     path: ${{ env.ARTIFACT_DIR }}
+
+      - name: Get Checksum
+        run: |
+          ARTIFACT_CHECKSUM=$(swift package compute-checksum ${{ env.ARTIFACT_PATH }})
+          echo "ARTIFACT_CHECKSUM=$ARTIFACT_CHECKSUM" >> $GITHUB_ENV
+
+      - name: Release
+        uses: softprops/action-gh-release@9729932bfb75c05ad1f6e3a729294e05abaa7001
+        with:
+          target_commitish: main
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: ${{ env.ARTIFACT_PATH }}
+          body: "XCFramework based on gifski-${{ env.GIFSKI_VERSION }} commit [${{ env.GIFSKI_COMMIT }}](${{ env.TDLIB_COMMIT_URL }})\n\nZIP Checksum `${{ env.ARTIFACT_CHECKSUM }}`"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

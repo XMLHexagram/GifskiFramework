@@ -15,7 +15,7 @@ let package = Package(
         .binaryTarget(
             name: "Gifski",
             url: "https://github.com/XMLHexagram/GifskiFramework/releases/download/1.11.0/GifskiFramework.zip",
-            checksum: "3fec39bfa2729d20c16e6fd726896b604c94842017f8ebb892c2118f3212635f"
+            checksum: "b108d9bbffcccd9ca83df8da51ffef0f35fcb1eb4fc25da0a60d14d93a2aa955"
         ),
     ]
 )

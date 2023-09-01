@@ -3,6 +3,6 @@ set -e
 
 cd "$( dirname "$0" )" || exit 1
 
-# ./prepare.sh
+./prepare.sh
 ./clean.sh
 ./build.sh 

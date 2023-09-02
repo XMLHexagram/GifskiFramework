@@ -11,6 +11,12 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      checkout_dst:
+        description: 'Checkout Destiny'
+        required: false
+        type: string
+        default: 'main'
 
 env:
   GIFSKI_REPO: https://github.com/ImageOptim/gifski
@@ -52,6 +58,14 @@ jobs:
         with:
           submodules: recursive
           
+      - name: Checkout Submodules
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          set -e
+          cd gifski && git fetch --all --tags && git checkout $CHECKOUT_DST && cd ..
+        env:
+          CHECKOUT_DST: ${{ inputs.checkout_dst }}
+
       - name: Set Envs
         run: |
           ARTIFACT_PATH="${{ env.ARTIFACT_DIR }}/${{ env.ARTIFACT_NAME }}"
@@ -59,8 +73,6 @@ jobs:
         
           RELEASES_DOWNLOAD_URL=https://github.com/$GITHUB_REPOSITORY/releases/download
           echo "RELEASES_DOWNLOAD_URL=$RELEASES_DOWNLOAD_URL" >> $GITHUB_ENV
-
-          cd gifski && git fetch --all --tags && git checkout 1.11.0 && cd ..
 
           GIFSKI_COMMIT=$(cd gifski && git rev-parse --short=8 HEAD)
           echo "GIFSKI_COMMIT=$GIFSKI_COMMIT" >> $GITHUB_ENV

@@ -24,4 +24,4 @@ You can find latest releases at [Releases](https://github.com/XMLHexagram/Gifski
 
 Code in this repo is under [MIT](LICENSE).
 
-But please pay attention the origin library [gifski](https://github.com/ImageOptim/gifski) is under AGPL 3 or later / alternative commercial licenses LICENSE. Checkout [gifski#license](https://github.com/ImageOptim/gifski#license) for more information.
+But please pay attention the origin library [gifski](https://github.com/ImageOptim/gifski) is under AGPL 3 or later / alternative commercial licenses. Checkout [gifski#license](https://github.com/ImageOptim/gifski#license) for more information.

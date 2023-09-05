@@ -17,7 +17,7 @@ def get_file_content(target):
 import PackageDescription
 
 let package = Package(
-    name: "TDLibFramework",
+    name: "GifskiFramework",
     products: [
         .library(
             name: "Gifski",

@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "TDLibFramework",
+    name: "GifskiFramework",
     products: [
         .library(
             name: "Gifski",
